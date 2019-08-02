@@ -1,4 +1,4 @@
-# vue-4
+# Build Todo App using Vue.js + Vuex + Material Design
 
 ## Project setup
 ```
