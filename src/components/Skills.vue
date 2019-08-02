@@ -10,23 +10,22 @@
      <md-field>
       <md-input class="input"  v-validate="'min:5'" name="skill" v-model="skillInput" v-on:keyup.enter="addSkill" type="text" placeholder="Enter a skill you have.."></md-input>
     </md-field>
-      <md-dialog-confirm
-      :md-active.sync="active"
-      md-title="คุณต้องการจะลบข้อมูลนี้หรือไม่?"
-      md-confirm-text="ยืนยันการลบ"
-      md-cancel-text="ยกเลิก"
-      @md-cancel="onCancel"
-      @md-confirm="onConfirm(skillKey)" />
     <p class="error" v-if="errors.has('skill')">ต้องไม่ต่ำกว่า 5 ตัวอักษร</p>
       <md-card class="skill-card" v-for="(skill, index) in skills" :key="index">
       <md-card-content>
-        <span class="text-skill">{{ index +1 }}. {{ skill.skill}}
+        <div class="text-skill">{{ index +1 }}. {{ skill.skill}}
           <span @click="removeSkill(skillKey = index)" class="remove">
           <md-button class="md-fab md-mini">
             <md-icon>delete</md-icon>
           </md-button>
           </span>
-        </span>
+           <span @click="editSkill(skillKey = index)" class="edit">
+            <md-button class="md-fab md-mini md-primary">
+              <md-icon>edit</md-icon>
+            </md-button>  
+          </span>
+        </div>
+       
       </md-card-content>
       </md-card>
     </div>
@@ -35,6 +34,27 @@
     </div>
     <div class="md-layout-item"></div>
   </div>
+
+  <md-dialog-confirm
+      :md-active.sync="remove"
+      md-title="คุณต้องการจะลบข้อมูลนี้หรือไม่?"
+      md-confirm-text="ยืนยันการลบ"
+      md-cancel-text="ยกเลิก"
+      @md-cancel="onCancelRemove"
+      @md-confirm="onConfirmRemove(skillKey)" 
+      />
+
+  <md-dialog-prompt
+      :md-active.sync="edit"
+      v-model="editValue"
+      md-title="แก้ไข Skill"
+      md-input-maxlength="20"
+      md-input-placeholder="Enter a skill you have.."
+      md-cancel-text="ยกเลิก"
+      md-confirm-text="ยืนยันการแก้ไข"
+      @md-cancel="onCancelEdit"
+      @md-confirm="onConfirmEdit(skillKey)" 
+      />
   </div>
 </template>
 
@@ -46,8 +66,10 @@ export default {
       name: 'Skills',
       skillInput: '',
       skillKey: '',
+      editValue: '',
       btnState: true,
-      active: false
+      remove: false,
+      edit: false
     }
   },
   computed: {
@@ -61,12 +83,26 @@ export default {
       this.skillInput = ''
     },
     removeSkill() {
-      this.active = true;
+      this.remove = true
     },
-    onConfirm (key) {
+    editSkill() {
+      this.editValue = this.$store.getters.getTodoByIndex(this.skillKey).skill
+      this.edit = true
+    },
+    onConfirmRemove (key) {
       this.$store.dispatch('removeTodo', key)
       },
-    onCancel () {
+    onCancelRemove () {
+    },
+    onConfirmEdit (key) {
+      if (this.editValue) {
+        this.$store.dispatch('editTodo', {
+          key,
+          newTodo: this.editValue
+        })
+      }
+    },
+    onCancelEdit () {
     }
   }
 }
@@ -87,9 +123,7 @@ h1 {
   border-left: 5px solid #59c1f1;
 }
 .skill-box {
-  padding: 1rem;
-  padding: 1rem;
-  min-width: 250px;
+  min-width: 280px;
 }
 
 ul {
@@ -109,6 +143,13 @@ list-style-type: none;
   position: absolute;
   cursor:pointer;
 }
+
+.edit {
+  right:40px;
+  position: absolute;
+  cursor:pointer;
+}
+
  .skill-layout {
   margin-top: 1rem;
   background: #c7d7ff;
