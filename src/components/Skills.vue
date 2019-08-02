@@ -2,8 +2,7 @@
   <div>
      <div class="md-layout">
     <div class="md-layout-item"></div>
-    <div class="md-layout-item">
-
+    <div class="md-layout-item skill-layout">
     <md-card>
     <md-card-content>
      <div class="skill-box">
@@ -18,7 +17,6 @@
       md-cancel-text="ยกเลิก"
       @md-cancel="onCancel"
       @md-confirm="onConfirm(skillKey)" />
-
     <p class="error" v-if="errors.has('skill')">ต้องไม่ต่ำกว่า 5 ตัวอักษร</p>
       <md-card class="skill-card" v-for="(skill, index) in skills" :key="index">
       <md-card-content>
@@ -49,28 +47,24 @@ export default {
       skillInput: '',
       skillKey: '',
       btnState: true,
-      skills: [
-        { skill: 'Vue.js'},
-        { skill: 'Frontend Developer'}
-      ],
       active: false
-
+    }
+  },
+  computed: {
+    skills () {
+      return this.$store.getters.getTodos
     }
   },
   methods: {
     addSkill() {
-      this.skills.push({
-        skill: this.skillInput
-      })
+      this.$store.dispatch('addTodo', this.skillInput)
       this.skillInput = ''
     },
     removeSkill() {
       this.active = true;
     },
     onConfirm (key) {
-      this.skills = this.skills.filter((skill, keys) => {
-        return keys !== key
-      });
+      this.$store.dispatch('removeTodo', key)
       },
     onCancel () {
     }
@@ -120,22 +114,17 @@ list-style-type: none;
 }
 
 .remove {
-  float:right;
+  right:5px;
+  position: absolute;
   cursor:pointer;
 }
 
-</style>
 
-
-<style lang="scss" scoped>
-@import "../../node_modules/vue-material/src/theme/engine";
-.md-layout-item {
-
-  &:nth-child(2) {
-    margin-top: 1rem;
-    background: #c7d7ff;
-  }
+ .skill-layout {
+  margin-top: 1rem;
+  background: #c7d7ff;
 }
+
 .md-icon {
   width: 13px;
   min-width: 13px;
@@ -152,4 +141,9 @@ list-style-type: none;
 .md-dialog {
   top: 20%;
 }
+</style>
+
+<style lang="scss" scoped>
+@import "../../node_modules/vue-material/src/theme/engine";
+
 </style>
