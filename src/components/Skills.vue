@@ -86,15 +86,6 @@ h1 {
   margin-top: 1rem;
   border-left: 5px solid #59c1f1;
 }
-.input {
-    width: 100%;
-    font-size: 20px;
-    outline: none;
-    background-color: #454242;
-    height: 40px;
-    border: 1px solid #ccc;
-    color: #ffffff;
-}
 .skill-box {
   padding: 1rem;
   padding: 1rem;
@@ -118,8 +109,6 @@ list-style-type: none;
   position: absolute;
   cursor:pointer;
 }
-
-
  .skill-layout {
   margin-top: 1rem;
   background: #c7d7ff;
