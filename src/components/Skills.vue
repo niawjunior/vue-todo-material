@@ -1,33 +1,35 @@
 <template>
   <div>
-     <div class="md-layout">
+    <div class="md-layout">
     <div class="md-layout-item"></div>
     <div class="md-layout-item skill-layout">
     <md-card>
     <md-card-content>
      <div class="skill-box">
-    <h1>{{ name }}</h1>
+      <h1>{{ name }}</h1>
      <md-field>
       <md-input class="input"  v-validate="'min:5'" name="skill" v-model="skillInput" v-on:keyup.enter="addSkill" type="text" placeholder="Enter a skill you have.."></md-input>
     </md-field>
     <p class="error" v-if="errors.has('skill')">ต้องไม่ต่ำกว่า 5 ตัวอักษร</p>
-      <md-card class="skill-card" v-for="(skill, index) in skills" :key="index">
+      <md-card class="skill-card" v-for="(skill, index) in skills" :key="skill.id">
       <md-card-content>
         <div class="text-skill">{{ index +1 }}. {{ skill.skill}}
-          <span @click="removeSkill(skillKey = index)" class="remove">
+          <span @click="removeSkill(skillKey = skill.id)" class="remove">
           <md-button class="md-fab md-mini">
             <md-icon>delete</md-icon>
           </md-button>
           </span>
-           <span @click="editSkill(skillKey = index)" class="edit">
+           <span @click="editSkill(skillKey = skill.id)" class="edit">
             <md-button class="md-fab md-mini md-primary">
               <md-icon>edit</md-icon>
             </md-button>  
           </span>
         </div>
-       
       </md-card-content>
       </md-card>
+      <div v-if="loading" style="text-align:center; margin-top: 20px;">
+     <md-progress-spinner md-mode="indeterminate"></md-progress-spinner>
+      </div>
     </div>
       </md-card-content>
       </md-card>
@@ -63,6 +65,7 @@ export default {
   name: 'Skill',
   data() {
     return {
+      button : false,
       name: 'Skills',
       skillInput: '',
       skillKey: '',
@@ -72,9 +75,15 @@ export default {
       edit: false
     }
   },
+  beforeCreate(){
+    this.$store.dispatch('setTodos');
+  },
   computed: {
-    skills () {
+    skills() {
       return this.$store.getters.getTodos
+    },
+    loading() {
+      return this.$store.state.load
     }
   },
   methods: {
@@ -86,8 +95,10 @@ export default {
       this.remove = true
     },
     editSkill() {
-      this.editValue = this.$store.getters.getTodoByIndex(this.skillKey).skill
-      this.edit = true
+      this.$store.getters.getTodoByIndex(this.skillKey).then(result => {
+        this.editValue = result[0].skill;
+        this.edit = true
+      })
     },
     onConfirmRemove (key) {
       this.$store.dispatch('removeTodo', key)
@@ -123,14 +134,9 @@ h1 {
   border-left: 5px solid #59c1f1;
 }
 .skill-box {
-  min-width: 280px;
+  min-width: 270px;
 }
 
-ul {
-list-style-type: none;
-    margin: auto;
-    padding: 0;
-}
 .text-skill {
   padding: .1rem;
   margin:.1rem;
@@ -145,27 +151,26 @@ list-style-type: none;
 }
 
 .edit {
-  right:40px;
+  right:45px;
   position: absolute;
   cursor:pointer;
 }
 
  .skill-layout {
   margin-top: 1rem;
-  background: #c7d7ff;
 }
 
 .md-icon {
-  width: 13px;
-  min-width: 13px;
-  height: 13px;
-  font-size: 13px!important;
+  width: 15px;
+  min-width: 15px;
+  height: 15px;
+  font-size: 15px!important;
 }
 
 .md-fab.md-mini {
-  width: 25px;
-  min-width: 25px;
-  height: 25px;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
   margin: auto;
 }
 .md-dialog {
@@ -175,5 +180,4 @@ list-style-type: none;
 
 <style lang="scss" scoped>
 @import "../../node_modules/vue-material/src/theme/engine";
-
 </style>
